@@ -79,7 +79,7 @@ const Buttons: FC<ButtonsProps> = ({
     light: {
       bg: "bg-gray-200 text-gray-800",
       hover: "hover:bg-gradient-to-r hover:from-gray-200 hover:to-gray-100 hover:ring-gray-300",
-      disabled: "bg-gray-100 cursor-not-allowed text-gray-400",
+      disabled: "bg-gray-100 cursor-not-allowed text-black-400",
     },
     purple: {
       bg: "bg-purple-600",

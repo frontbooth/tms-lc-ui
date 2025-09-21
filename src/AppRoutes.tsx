@@ -5,6 +5,7 @@ import Amendment from "./components/pages/Amendment/Amendment";
 import Settlement from "./components/pages/Settlement/Settlement";
 import Closure from "./components/pages/Closure/Closure";
 import Homepage from "./components/pages/HomePage/Homepage";
+import DraftForm from "./components/pages/Draft/DraftForm/DraftForm";
 
 const AppRoutes = () => {
   return (
@@ -16,6 +17,7 @@ const AppRoutes = () => {
         <Route path="/amendment" element={<Amendment />} />
         <Route path="/settlement" element={<Settlement />} />
         <Route path="/closure" element={<Closure />} />
+        <Route path="/DraftForm" element={<DraftForm />} />
       </Routes>
     </BrowserRouter>
   );

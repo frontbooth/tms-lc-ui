@@ -1,18 +1,18 @@
 import { Modal as AntdModal } from "antd";
-import type { ReactNode } from "react";
+import type { FC, ReactNode } from "react";
 
 interface ReusableModalProps {
   isOpen: boolean;
   onClose: () => void;
   name: string;
   children: ReactNode;
-  modalIcon?: "true" | "false";
+  modalIcon?: string; 
   width?: number;
   noOverlay?: boolean;
   zIndex?: number;
 }
 
-const ReusableModal: React.FC<ReusableModalProps> = ({
+const ReusableModal: FC<ReusableModalProps> = ({
   isOpen,
   onClose,
   name,

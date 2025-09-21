@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import Buttons from '../atoms/Buttons';
+import Buttons from '../atoms/Buttons/Buttons';
 
 interface ChildLayoutProps {
   title?: string;

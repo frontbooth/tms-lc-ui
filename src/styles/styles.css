@@ -36,8 +36,22 @@ html, body {
   --primary-text-color: #000000;
   --secondary-text-color: #303133;
 
-
-
 }
+
+
+/* antdesign Custom CSS start */
+
+.custom-modal .ant-modal-content {
+  padding: 5px;
+  margin-top: -80px;
+  background-color: #e2e2e2;
+}
+
+.custom-modal .ant-modal-close {
+  top: 15px;
+}
+
+
+/* antdesign Custom CSS ends */
 
 

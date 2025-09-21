@@ -7,7 +7,7 @@ interface MainTableProps<RecordType> {
   searchText: string;
   setSearchText: Dispatch<SetStateAction<string>>;
   pagination?: boolean;
-  columns?: TableProps<RecordType>["columns"]; // made optional
+  columns?: TableProps<RecordType>["columns"]; 
   dataSource: RecordType[];
   pageSize?: number;
   onRow?: TableProps<RecordType>["onRow"];
@@ -69,11 +69,11 @@ const MainTable = <RecordType extends Record<string, any>>({
             <div className="ml-auto w-52">
               <Input
                 placeholder="Search..."
+                size="large"
                 value={searchText}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setSearchText(e.target.value)
                 }
-                size="middle"
                 allowClear
               />
             </div>

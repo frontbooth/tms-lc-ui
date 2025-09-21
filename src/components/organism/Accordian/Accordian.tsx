@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import type { FC } from "react";
 import type { MouseEvent, ReactNode } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 
@@ -9,7 +10,7 @@ interface AccordionProps {
   isFirstOpen?: boolean;
 }
 
-const Accordion: React.FC<AccordionProps> = ({
+const Accordion: FC<AccordionProps> = ({
   title,
   children,
   isAllOpen = false,
@@ -22,7 +23,7 @@ const Accordion: React.FC<AccordionProps> = ({
   };
 
   const handleButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation(); // Stop parent onClick
+    e.stopPropagation(); 
     toggleExpand();
   };
 

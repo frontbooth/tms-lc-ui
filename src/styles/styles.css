@@ -39,8 +39,9 @@ html, body {
 }
 
 
-/* antdesign Custom CSS start */
+/* ################ antdesign Custom CSS start ################ */
 
+/* antd modal */
 .custom-modal .ant-modal-content {
   padding: 5px;
   margin-top: -80px;
@@ -51,7 +52,30 @@ html, body {
   top: 15px;
 }
 
+/* antd Tabs */
 
-/* antdesign Custom CSS ends */
+.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--primary-color) !important;
+}
+
+.ant-tabs-tab:hover .ant-tabs-tab-btn {
+  color: var(--primary-color) !important;
+}
+
+.ant-tabs-ink-bar {
+  background-color: var(--primary-color) !important;
+}
+
+.ant-tabs-tab
+{
+  margin: 0 0 0 14px!important;
+}
+
+.ant-tabs .ant-tabs-tab .anticon:not(:last-child) {
+  margin-right: 0px!important;
+}
+
+
+/* ################antdesign Custom CSS ends ################ */
 
 

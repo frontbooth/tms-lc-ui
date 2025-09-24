@@ -10,7 +10,7 @@ import {
   REHYDRATE,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import type { Reducer } from "redux"; 
+import type { UnknownAction } from "redux"; 
 
 // --- Persist Config ---
 const persistConfig = {
@@ -20,8 +20,11 @@ const persistConfig = {
 };
 
 // --- Root Reducer ---
-const rootReducer: Reducer = (state = {}, action) => {
-  return state;
+const rootReducer = (state = {}, action: UnknownAction) => {
+  switch (action.type) {
+    default:
+      return state;
+  }
 };
 
 // --- Persisted Reducer ---

@@ -4,15 +4,19 @@ import Buttons from '../atoms/Buttons/Buttons';
 interface ChildLayoutProps {
   title?: string;
   children: ReactNode;
-  showButton?: boolean; 
-  onButtonClick?: () => void; 
+  showButton?: boolean;
+  onButtonClick?: () => void;
+  withCardStyle?: boolean;  
+  bgColorClass?: string;
 }
 
 const ChildLayout = ({
   title,
   children,
-  showButton = true, 
+  showButton = true,
   onButtonClick,
+  withCardStyle = true,      
+  bgColorClass = 'bg-white',  
 }: ChildLayoutProps) => {
   return (
     <div className="w-full p-2">
@@ -32,7 +36,14 @@ const ChildLayout = ({
         </div>
       )}
 
-      <div className="p-4 mt-4 mb-12 border-b-3 border-[var(--primary-color)] rounded-[8px] bg-white text-gray-800 shadow-[0px_2px_8px_0px_rgba(99,99,99,0.2)]">
+      <div
+        className={`p-4 mt-4 mb-12 rounded-[8px] text-gray-800 
+        ${withCardStyle ? `
+          border-b-3 border-[var(--primary-color)] 
+          shadow-[0px_2px_8px_0px_rgba(99,99,99,0.2)] 
+          ${bgColorClass}
+        ` : ''}`}
+      >
         {children}
       </div>
     </div>

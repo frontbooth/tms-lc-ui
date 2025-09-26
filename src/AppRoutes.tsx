@@ -6,6 +6,7 @@ import Settlement from "./components/pages/Settlement/Settlement";
 import Closure from "./components/pages/Closure/Closure";
 import Homepage from "./components/pages/HomePage/Homepage";
 import DraftForm from "./components/pages/Draft/DraftForm/DraftForm";
+import DraftPreview from "./components/pages/Draft/DraftPreview/DraftPreview";
 
 const AppRoutes = () => {
   return (
@@ -13,11 +14,13 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/draft" element={<Draft />} />
+         <Route path="/DraftForm" element={<DraftForm />} />
+         <Route path="/draft-preview" element={<DraftPreview />} />
         <Route path="/issuance" element={<Issuance />} />
         <Route path="/amendment" element={<Amendment />} />
         <Route path="/settlement" element={<Settlement />} />
         <Route path="/closure" element={<Closure />} />
-        <Route path="/DraftForm" element={<DraftForm />} />
+       
       </Routes>
     </BrowserRouter>
   );

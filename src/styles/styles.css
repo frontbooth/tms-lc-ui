@@ -41,6 +41,16 @@ html, body {
 
 /* ################ antdesign Custom CSS start ################ */
 
+/* Remove antd background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+    -webkit-text-fill-color: #000 !important;
+}
+
+
 /* antd modal */
 .custom-modal .ant-modal-content {
   padding: 5px;

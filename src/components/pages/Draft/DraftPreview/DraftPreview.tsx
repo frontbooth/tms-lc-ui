@@ -6,7 +6,11 @@ import LCDraftDetails from "./LCDraftDetails/LCDraftDetails";
 import RequestDetails from "./RequestDetails/RequestDetails";
 import Buttons from "../../../atoms/Buttons/Buttons";
 
-const DraftPreview: FC = () => {
+interface DraftPreviewProps {
+  setShowPreview: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const DraftPreview: FC<DraftPreviewProps> = ({ setShowPreview }) => {
   return (
     <ChildLayout
       title="Letter of Credit Draft Form"
@@ -25,15 +29,16 @@ const DraftPreview: FC = () => {
         <LCDraftDetails />
       </Accordion>
 
-          <div className="flex justify-end my-8">
-  
-                <Buttons
-                  label="Submit"
-                  color="secondary"
-                  showarrowicon
-                  type="submit"
-                />
-              </div>
+      <div className="flex justify-between my-8">
+        <Buttons
+          label="Back"
+          color="primary"
+          showarrowicon
+          type="button"
+          onClick={() => setShowPreview(false)}
+        />
+        <Buttons label="Submit" color="secondary" showarrowicon type="submit" />
+      </div>
     </ChildLayout>
   );
 };

@@ -3,98 +3,28 @@ import type { InputRef } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import type { FormikValues } from "formik";
 import { useFormikContext } from "formik";
-import { forwardRef, useState } from "react";
+import { forwardRef, useCallback, useMemo } from "react";
 import { formatAmount } from "../../../utils/usFormat";
 import type { ReactNode, FocusEvent } from "react";
 
 // --------------------------------------------
-// Type for synthetic value events (masked/amount inputs)
-// This allows us to simulate Formik-style events.
-// --------------------------------------------
-type ValueChangeEvent = { target: { value: string } };
-
-// --------------------------------------------
-// Props for MaskedInput component
-// Supports AntD Input styling, size, mask formatting
-// --------------------------------------------
-interface MaskedInputProps {
-  maskFormat: string; // e.g., "999-999-9999"
-  placeholder?: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement> | ValueChangeEvent) => void;
-  size?: "small" | "middle" | "large";
-  style?: React.CSSProperties;
-  [key: string]: any;
-}
-
-// --------------------------------------------
-// MaskedInput: formats input according to mask
-// --------------------------------------------
-const MaskedInput: React.FC<MaskedInputProps> = ({
-  maskFormat,
-  placeholder,
-  value,
-  onChange,
-  size,
-  style,
-  ...props
-}) => {
-  const [inputValue, setInputValue] = useState<string>(value || "");
-
-  // Function to apply mask
-  const formatValue = (val: string) => {
-    if (!val) return "";
-    let formatted = "";
-    let valIndex = 0;
-    for (let i = 0; i < maskFormat.length && valIndex < val.length; i++) {
-      const maskChar = maskFormat[i];
-      if (maskChar === "9") {
-        if (/\d/.test(val[valIndex])) {
-          formatted += val[valIndex];
-          valIndex++;
-        } else {
-          valIndex++;
-          i--;
-        }
-      } else {
-        formatted += maskChar;
-      }
-    }
-    return formatted;
-  };
-
-  // Handler for input change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value.replace(/[^0-9]/g, "");
-    const formattedValue = formatValue(rawValue);
-    setInputValue(formattedValue);
-    onChange?.({ target: { value: formattedValue } });
-  };
-
-  return (
-    <Input
-      value={inputValue}
-      onChange={handleChange}
-      placeholder={placeholder}
-      size={size}
-      style={style}
-      {...props}
-    />
-  );
-};
-
-// --------------------------------------------
-// Type for select, radio, checkbox options
+// Types
 // --------------------------------------------
 interface Option {
   value: string | number;
   label: string | ReactNode;
 }
 
-// --------------------------------------------
-// Props for AtomInputFormik
-// Supports multiple input types: text, number, textarea, password, mask, radio, checkbox, select, date, amount
-// --------------------------------------------
+interface MaskedInputProps {
+  maskFormat: string;
+  placeholder?: string;
+  value?: string;
+  onChange?: (e: { target: { value: string } }) => void;
+  size?: "small" | "middle" | "large";
+  style?: React.CSSProperties;
+  disabled?: boolean;
+}
+
 interface AtomInputFormikProps {
   name: string;
   type?:
@@ -108,26 +38,80 @@ interface AtomInputFormikProps {
     | "select"
     | "date"
     | "amount";
-  label?: string; // Label above input
-  checkedLabel?: string; // Label next to checkbox
+  label?: string;
+  checkedLabel?: string;
   required?: boolean;
-  maskFormat?: string; // for mask type
-  max?: number; // max length
+  maskFormat?: string;
+  max?: number;
   options?: Option[];
-  multiple?: boolean; // for select multiple
+  multiple?: boolean;
   size?: "small" | "middle" | "large";
-  showSearch?: boolean; // for select search
+  showSearch?: boolean;
   placeholder?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement> | ValueChangeEvent) => void;
-  onBlur?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement> | ValueChangeEvent) => void;
+  onChange?: (e: any) => void;
+  onBlur?: (e: any) => void;
   style?: React.CSSProperties;
   labelClassName?: string;
+  disabled?: boolean;
   [key: string]: any;
 }
 
 // --------------------------------------------
-// AtomInputFormik Component
-// Wraps AntD inputs with Formik integration
+// MaskedInput Component (Optimized)
+// --------------------------------------------
+const MaskedInput: React.FC<MaskedInputProps> = ({
+  maskFormat,
+  placeholder,
+  value = "",
+  onChange,
+  size,
+  style,
+  disabled,
+  ...props
+}) => {
+  const formatValue = useCallback((val: string): string => {
+    if (!val) return "";
+    
+    let formatted = "";
+    let valIndex = 0;
+    
+    for (let i = 0; i < maskFormat.length && valIndex < val.length; i++) {
+      const maskChar = maskFormat[i];
+      if (maskChar === "9") {
+        if (/\d/.test(val[valIndex])) {
+          formatted += val[valIndex];
+          valIndex++;
+        } else {
+          valIndex++;
+        }
+      } else {
+        formatted += maskChar;
+      }
+    }
+    return formatted;
+  }, [maskFormat]);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, "");
+    const formattedValue = formatValue(rawValue);
+    onChange?.({ target: { value: formattedValue } });
+  }, [formatValue, onChange]);
+
+  return (
+    <Input
+      value={value}
+      onChange={handleChange}
+      placeholder={placeholder}
+      size={size}
+      style={style}
+      disabled={disabled}
+      {...props}
+    />
+  );
+};
+
+// --------------------------------------------
+// AtomInputFormik Component (Optimized)
 // --------------------------------------------
 const AtomInputFormik = forwardRef<InputRef, AtomInputFormikProps>(
   (
@@ -147,79 +131,103 @@ const AtomInputFormik = forwardRef<InputRef, AtomInputFormikProps>(
       labelClassName = "block text-sm font-normal text-gray-700 mb-2",
       required,
       showSearch = true,
+      disabled,
+      style,
       ...props
     },
     ref
   ) => {
-    // Formik hooks
-    const {
-      values,
-      errors,
-      touched,
-      handleChange: formikHandleChange,
-      handleBlur: formikHandleBlur,
-      setFieldValue,
-    } = useFormikContext<FormikValues>();
+    // Formik context
+    const { values, errors, touched, setFieldValue, handleBlur: formikHandleBlur } = 
+      useFormikContext<FormikValues>();
 
     const value = values?.[name];
     const error = touched?.[name] && errors?.[name];
+    const hasError = Boolean(error);
 
-    const errorStyle: React.CSSProperties = { borderColor: "#ff4d4f" };
+    // Memoized styles and values
+    const errorStyle = useMemo((): React.CSSProperties => ({ 
+      borderColor: "#ff4d4f" 
+    }), []);
 
-    // Generic change wrapper to handle Formik and external onChange
-    const handleChangeWrapper = (
-      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | ValueChangeEvent
-    ) => {
-      if (!("nativeEvent" in e)) {
-        formikHandleChange({ target: { name, value: e.target.value } });
-      } else {
-        formikHandleChange(e);
-      }
-      onChange?.(e);
-    };
+    const inputStyle = useMemo(() => 
+      hasError ? { ...errorStyle, ...style } : style,
+    [hasError, errorStyle, style]);
 
-    // Generic blur wrapper
-    const handleBlurWrapper = (
-      e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement> | ValueChangeEvent
-    ) => {
-      if (!("nativeEvent" in e)) {
-        formikHandleBlur({ target: { name, value: e.target.value } } as any);
-      } else {
+    const pickerValue = useMemo((): Dayjs | null => 
+      value && typeof value === "string" ? dayjs(value) : (value as Dayjs) || null,
+    [value]);
+
+    // Event handlers
+    const handleBlurWrapper = useCallback((e: any) => {
+      if (e?.target) {
         formikHandleBlur(e);
+      } else {
+        // Handle synthetic events
+        formikHandleBlur({ target: { name, value: e?.target?.value || value } });
       }
       onBlur?.(e);
-    };
+    }, [formikHandleBlur, name, value, onBlur]);
 
-    // Specialized handlers for radio, select, checkbox
-    const handleRadioChange = (e: any) => {
+    const handleRadioChange = useCallback((e: any) => {
       setFieldValue(name, e.target.value);
       onChange?.(e);
-    };
+    }, [setFieldValue, name, onChange]);
 
-    const handleSelectChange = (val: any) => {
+    const handleSelectChange = useCallback((val: any) => {
       setFieldValue(name, val);
       onChange?.({ target: { value: val } });
-    };
+    }, [setFieldValue, name, onChange]);
 
-    const handleCheckboxChange = (e: any) => {
+    const handleCheckboxChange = useCallback((e: any) => {
       setFieldValue(name, e.target.checked);
       onChange?.(e);
-    };
+    }, [setFieldValue, name, onChange]);
 
-    // Convert string to Dayjs for DatePicker
-    const pickerValue: Dayjs | null =
-      value && typeof value === "string" ? dayjs(value) : (value as Dayjs) || null;
+    const handleAmountInput = useCallback((e: React.FormEvent<HTMLInputElement>) => {
+      let val = (e.target as HTMLInputElement).value.replace(/[^\d.]/g, "");
+      const decimalIndex = val.indexOf(".");
+      
+      if (decimalIndex !== -1) {
+        val = val.substring(0, decimalIndex + 1) + val.substring(decimalIndex + 1, decimalIndex + 3);
+      }
+      
+      setFieldValue(name, val);
+      onChange?.({ target: { value: val } });
+    }, [setFieldValue, name, onChange]);
+
+    const handleAmountBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+      const rawValue = e.target.value;
+      if (rawValue) {
+        const numericValue = parseFloat(rawValue.replace(/,/g, ""));
+        if (!isNaN(numericValue)) {
+          const formatted = formatAmount(numericValue);
+          setFieldValue(name, formatted);
+          onChange?.({ target: { value: formatted } });
+        }
+      }
+      formikHandleBlur(e);
+      onBlur?.(e);
+    }, [setFieldValue, name, onChange, formikHandleBlur, onBlur]);
+
+    const handleNumberChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+      const digits = e.target.value.replace(/\D/g, "");
+      setFieldValue(name, digits);
+      onChange?.(e);
+    }, [setFieldValue, name, onChange]);
+
+    // Common props for all input types
+    const commonProps = useMemo(() => ({
+      name,
+      placeholder,
+      size,
+      style: inputStyle,
+      disabled,
+      ...props,
+    }), [name, placeholder, size, inputStyle, disabled, props]);
 
     // Render input based on type
-    const renderInput = () => {
-      const commonProps = {
-        name,
-        placeholder,
-        size,
-        style: error ? { ...errorStyle, ...props.style } : props.style,
-        ...props,
-      };
-
+    const renderInput = useCallback(() => {
       switch (type) {
         case "textarea":
           return (
@@ -227,162 +235,153 @@ const AtomInputFormik = forwardRef<InputRef, AtomInputFormikProps>(
               {...commonProps}
               ref={ref}
               value={value}
-              onChange={handleChangeWrapper}
+              onChange={(e) => {
+                setFieldValue(name, e.target.value);
+                onChange?.(e);
+              }}
               onBlur={handleBlurWrapper}
               maxLength={max}
             />
           );
+
         case "number":
           return (
             <Input
               {...commonProps}
               ref={ref}
               value={value}
-              onChange={(e) => {
-                const digits = e.target.value.replace(/\D/g, "");
-                setFieldValue(name, digits);
-                onChange?.(e);
-              }}
+              onChange={handleNumberChange}
+              onBlur={handleBlurWrapper}
               inputMode="numeric"
               pattern="\d*"
-              onBlur={handleBlurWrapper}
-              style={{ width: "100%", ...(error ? errorStyle : {}), ...props.style }}
             />
           );
+
         case "date":
           return (
             <DatePicker
               {...commonProps}
               value={pickerValue}
-              disabledDate={props.disabledDate}
-              onChange={(date) =>
-                setFieldValue(name, date ? date.toISOString() : "")
-              }
-              style={{ width: "100%", ...(error ? errorStyle : {}), ...props.style }}
+              onChange={(date) => setFieldValue(name, date ? date.toISOString() : "")}
+              onBlur={handleBlurWrapper}
+              style={{ width: "100%", ...inputStyle }}
             />
           );
+
         case "password":
           return (
             <Input.Password
               {...commonProps}
               ref={ref}
               value={value}
-              onChange={handleChangeWrapper}
+              onChange={(e) => {
+                setFieldValue(name, e.target.value);
+                onChange?.(e);
+              }}
               onBlur={handleBlurWrapper}
               maxLength={max}
             />
           );
+
         case "mask":
           return (
             <MaskedInput
               {...commonProps}
-              ref={ref}
-              value={value}
               maskFormat={maskFormat!}
-              onChange={handleChangeWrapper}
+              value={value}
+              onChange={({ target }) => {
+                setFieldValue(name, target.value);
+                onChange?.({ target: { value: target.value } });
+              }}
             />
           );
+
         case "radio":
           return (
             <Radio.Group
-              name={name}
+              {...commonProps}
               value={value}
               onChange={handleRadioChange}
-              onBlur={(e: FocusEvent<HTMLDivElement>) => handleBlurWrapper(e as any)}
-              size={size}
-              {...props}
+              onBlur={handleBlurWrapper}
             >
-              {options.map((option: Option) => (
+              {options.map((option) => (
                 <Radio key={option.value} value={option.value}>
                   {option.label}
                 </Radio>
               ))}
             </Radio.Group>
           );
+
         case "checkbox":
           return (
             <Checkbox
-              name={name}
-              checked={value}
+              {...commonProps}
+              checked={Boolean(value)}
               onChange={handleCheckboxChange}
-              onBlur={(e: FocusEvent<HTMLDivElement>) => handleBlurWrapper(e as any)}
-              {...props}
+              onBlur={handleBlurWrapper}
             >
-              <div className="text-[14px] font-lite text-gray-700">
-                {checkedLabel}
-              </div>
+              {checkedLabel && (
+                <span className="text-[14px] font-lite text-gray-700">
+                  {checkedLabel}
+                </span>
+              )}
             </Checkbox>
           );
+
         case "select":
           return (
             <Select
               {...commonProps}
               showSearch={showSearch}
               optionFilterProp="label"
-              filterOption={(input, option: any) =>
+              filterOption={(input, option) =>
                 option.label.toString().toLowerCase().includes(input.toLowerCase())
               }
+              value={value}
               onChange={handleSelectChange}
+              onBlur={handleBlurWrapper}
               mode={multiple ? "multiple" : undefined}
-              style={{ width: "100%", ...(error ? errorStyle : {}), ...props.style }}
-              options={options.map((option: Option) => ({
-                value: option.value,
-                label: option.label,
-              }))}
+              style={{ width: "100%", ...inputStyle }}
+              options={options}
             />
           );
+
         case "amount":
           return (
             <Input
               {...commonProps}
               ref={ref}
               value={value}
-              onInput={(e: React.FormEvent<HTMLInputElement>) => {
-                let val = (e.target as HTMLInputElement).value;
-                val = val.replace(/[^0-9,.]/g, "");
-                const decimalIndex = val.indexOf(".");
-                if (decimalIndex !== -1) {
-                  const beforeDecimal = val.substring(0, decimalIndex + 1);
-                  const afterDecimal = val.substring(decimalIndex + 1, decimalIndex + 3);
-                  val = beforeDecimal + afterDecimal;
-                }
-                (e.target as HTMLInputElement).value = val;
-                setFieldValue(name, val);
-                onChange?.({ target: { value: val } });
-              }}
-              onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
-                const rawValue = e.target.value;
-                if (rawValue) {
-                  const numericValue = parseFloat(rawValue.replace(/,/g, ""));
-                  if (!isNaN(numericValue)) {
-                    const formatted = formatAmount(numericValue);
-                    e.target.value = formatted;
-                    setFieldValue(name, formatted);
-                    onChange?.({ target: { value: formatted } });
-                  }
-                }
-                formikHandleBlur(e);
-                onBlur?.(e);
-              }}
+              onInput={handleAmountInput}
+              onBlur={handleAmountBlur}
             />
           );
-        default:
+
+        default: // text
           return (
             <Input
               {...commonProps}
               ref={ref}
               value={value}
-              onChange={handleChangeWrapper}
+              onChange={(e) => {
+                setFieldValue(name, e.target.value);
+                onChange?.(e);
+              }}
               onBlur={handleBlurWrapper}
               maxLength={max}
             />
           );
       }
-    };
+    }, [
+      type, commonProps, value, max, maskFormat, options, showSearch, multiple,
+      pickerValue, handleRadioChange, handleCheckboxChange, handleSelectChange,
+      handleAmountInput, handleAmountBlur, handleNumberChange, handleBlurWrapper,
+      setFieldValue, name, onChange, inputStyle, ref, checkedLabel
+    ]);
 
     return (
-      <div>
-        {/* Label rendering */}
+      <div className="atom-input-formik">
+        {/* Label */}
         {label && type !== "checkbox" && (
           <div className="flex items-start relative">
             {required && (
@@ -393,14 +392,22 @@ const AtomInputFormik = forwardRef<InputRef, AtomInputFormikProps>(
             </label>
           </div>
         )}
+
+        {/* Input */}
         {renderInput()}
-        {/* Error message */}
+
+        {/* Error Message */}
         {error && (
-          <div className="text-[#ff4d4f] text-[14px]">{String(error)}</div>
+          <div className="text-[#ff4d4f] text-[14px] mt-1">
+            {String(error)}
+          </div>
         )}
       </div>
     );
   }
 );
+
+// Add display name for better debugging
+AtomInputFormik.displayName = 'AtomInputFormik';
 
 export { AtomInputFormik };

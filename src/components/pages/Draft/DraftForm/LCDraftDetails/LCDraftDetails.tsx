@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import { AtomInputFormik } from "../../../../atoms/Input/AtomInputFormik";
 import Buttons from "../../../../atoms/Buttons/Buttons";
+import { currencyOptions } from "../../../../../utils/ListOfValues";
 
 const LCDraftRequest: FC = () => {
   return (
@@ -55,7 +56,7 @@ const LCDraftRequest: FC = () => {
         <AtomInputFormik
           name="creditType"
           label="Type of Credit"
-          type="radio"
+          type="select"
           options={[
             { label: "Sight Credit", value: "Sight" },
             { label: "Usance Credit", value: "Usance" },
@@ -95,7 +96,7 @@ const LCDraftRequest: FC = () => {
           name="placeOfExpiry"
           label="Place of Expiry"
           placeholder="Enter Place of Expiry"
-          type="text"
+          type="date"
         />
 
         <AtomInputFormik
@@ -116,7 +117,8 @@ const LCDraftRequest: FC = () => {
           name="currencyCode"
           label="Currency Code"
           placeholder="Enter Currency Code"
-          type="text"
+          type="select"
+          options={currencyOptions}
         />
 
         <AtomInputFormik
@@ -143,7 +145,7 @@ const LCDraftRequest: FC = () => {
         <AtomInputFormik
           name="availableBy"
           label="Available By"
-          type="radio"
+          type="select"
           options={[
             { label: "Payment", value: "Payment" },
             { label: "Negotiation", value: "Negotiation" },
@@ -180,7 +182,7 @@ const LCDraftRequest: FC = () => {
         <AtomInputFormik
           name="partialShipments"
           label="Partial Shipments"
-          type="radio"
+          type="select"
           options={[
             { label: "Allowed", value: "Allowed" },
             { label: "Not Allowed", value: "NotAllowed" },
@@ -191,7 +193,7 @@ const LCDraftRequest: FC = () => {
         <AtomInputFormik
           name="transhipments"
           label="Transhipments"
-          type="radio"
+          type="select"
           options={[
             { label: "Allowed", value: "Allowed" },
             { label: "Not Allowed", value: "NotAllowed" },
@@ -272,7 +274,7 @@ const LCDraftRequest: FC = () => {
         <AtomInputFormik
           name="confirmationInstructions"
           label="Confirmation Instructions"
-          type="radio"
+          type="select"
           options={[
             { label: "Confirm", value: "Confirm" },
             { label: "May Add", value: "MayAdd" },

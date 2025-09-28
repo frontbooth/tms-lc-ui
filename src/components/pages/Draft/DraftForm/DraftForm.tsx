@@ -11,15 +11,19 @@ import CustomerDetails from "./CustomerDetails/CustomerDetails";
 import LCDraftDetails from "./LCDraftDetails/LCDraftDetails";
 import { UseScrollToFirstError } from "../../../atoms/hooks/UseScrollToFirstError";
 import DocumentUpload from "./DocumentUpload/DocumentUpload";
+import DraftPreview from "../DraftPreview/DraftPreview";
 
 const validationSchema = Yup.object({
   requestInitiatedBy: Yup.string().required("Request Initiated By is required"),
-  requestInitiatedFrom: Yup.string().required("Request Initiated From is required"),
+  requestInitiatedFrom: Yup.string().required(
+    "Request Initiated From is required"
+  ),
   solId: Yup.string().required("SOL ID is required"),
-  requestedDate: Yup.date().required("Requested Date is required"),
   applicantName: Yup.string().required("Applicant Name is required"),
   address: Yup.string().required("Address is required"),
-  emailId: Yup.string().email("Invalid Email format").required("Email ID is required"),
+  emailId: Yup.string()
+    .email("Invalid Email format")
+    .required("Email ID is required"),
   urm: Yup.string().required("URM is required"),
   cif: Yup.string().required("CIF is required"),
   registrationNumber: Yup.string().required("Registration Number is required"),
@@ -30,15 +34,20 @@ const validationSchema = Yup.object({
 const DraftForm: FC = () => {
   const [isAllOpen, setIsAllOpen] = useState(false);
   const navigate = useNavigate();
+  const [showPreview, setShowPreview] = useState(false);
 
   return (
-    <ChildLayout title="Letter of Credit Draft Form" showButton={false} withCardStyle={false}>
+    <ChildLayout
+      title="Letter of Credit Draft Form"
+      showButton={false}
+      withCardStyle={false}
+    >
       <Formik
         initialValues={{
-          requestInitiatedBy: "",
-          requestInitiatedFrom: "",
-          solId: "",
-          requestedDate: "",
+          requestInitiatedBy: "Shristi Upadhaya",
+          requestInitiatedFrom: "Hattisar",
+          solId: "001",
+          requestedDate: null,
           applicantName: "",
           address: "",
           emailId: "",
@@ -47,14 +56,53 @@ const DraftForm: FC = () => {
           registrationNumber: "",
           pan: "",
           eximCode: "",
+          extractPreviousDraft: "",
+          lcReferenceNumber: "",
+          sequenceOfTotal: "",
+          formOfDocumentaryCredit: "",
+          creditType: "",
+          documentaryCreditNumber: "",
+          dateOfIssue: "",
+          applicableRules: "",
+          dateOfExpiry: "",
+          placeOfExpiry: "",
+          applicant: "",
+          beneficiary: "",
+          currencyCode: "",
+          amount: "",
+          tolerance: "",
+          availableWith: "",
+          availableBy: "",
+          mixedPaymentDetails: "",
+          paymentTerms: "",
+          drawee: "",
+          partialShipments: "",
+          transhipments: "",
+          placeOfTakingInCharge: "",
+          portOfLoading: "",
+          portOfDischarge: "",
+          latestDateOfShipment: "",
+          placeOfFinalDestination: "",
+          descriptionOfGoods: "",
+          documentsRequired: "",
+          additionalConditions: "",
+          charges: "",
+          periodOfPresentation: "",
+          confirmationInstructions: "",
+          requestedConfirmationParty: "",
+          reimbursingBank: "",
+          instructionsToBank: "",
+          adviseThroughBank: "",
+          senderToReceiverInformation: "",
         }}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={(values) => {
           console.log("Form Submitted:", values);
-          navigate("/draft-preview", { state: values });
+          setShowPreview(true);
+          // navigate("/draft-preview", { state: values });
         }}
       >
-        {({ errors, submitCount }) => {
+        {({ errors, submitCount, values }) => {
           // open accordion on first submit if validationerrors exist in formik
           if (submitCount > 0 && Object.keys(errors).length > 0 && !isAllOpen) {
             setIsAllOpen(true);
@@ -65,28 +113,41 @@ const DraftForm: FC = () => {
 
           return (
             <Form>
-              <LCDraftRequest />
+              <div
+                id="lc-draft-form-pane"
+                className={showPreview ? "hidden" : "block"}
+                aria-hidden={showPreview ? "true" : "false"}
+              >
+                <LCDraftRequest />
 
-              <Accordion title="Customer Details" isAllOpen={isAllOpen}>
-                <CustomerDetails />
-              </Accordion>
+                <Accordion title="Customer Details" isAllOpen={isAllOpen}>
+                  <CustomerDetails />
+                </Accordion>
 
-              <Accordion title="LC Draft Details" isAllOpen={isAllOpen}>
-                <LCDraftDetails />
-              </Accordion>
+                <Accordion title="LC Draft Details" isAllOpen={isAllOpen}>
+                  <LCDraftDetails />
+                </Accordion>
 
-              <Accordion title="Document Upload" isAllOpen={isAllOpen}>
-                <DocumentUpload />
-              </Accordion>
+                <Accordion title="Document Upload" isAllOpen={isAllOpen}>
+                  <DocumentUpload />
+                </Accordion>
 
-              <div className="flex justify-between my-8">
-                <Buttons label="Back" color="primary" />
-                <Buttons
-                  label="Preview"
-                  color="secondary"
-                  showarrowicon
-                  type="submit"
-                />
+                <div className="flex justify-between my-8">
+                  <Buttons label="Back" color="primary" />
+                  <Buttons
+                    label="Preview"
+                    color="secondary"
+                    showarrowicon
+                    type="submit"
+                  />
+                </div>
+              </div>
+              <div
+                id="lc-draft-form-preview"
+                className={showPreview ? "block" : "hidden"}
+                aria-hidden={showPreview ? "false" : "true"}
+              >
+                <DraftPreview setShowPreview={setShowPreview} />
               </div>
             </Form>
           );

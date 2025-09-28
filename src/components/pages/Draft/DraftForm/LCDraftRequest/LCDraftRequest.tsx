@@ -9,32 +9,34 @@ const LCDraftRequest: FC = () => {
           name="requestInitiatedBy"
           label="Request Initiated By"
           placeholder="Enter Request Initiated By"
-          required
           type="text"
+          disabled={true}
+          
         />
 
         <AtomInputFormik
           name="requestInitiatedFrom"
           label="Request Initiated From"
           placeholder="Enter Request Initiated From"
-          required
           type="text"
+          disabled
         />
 
         <AtomInputFormik
           name="solId"
           label="SOL ID"
           placeholder="Enter SOL ID"
-          required
           type="text"
+          disabled
         />
 
         <AtomInputFormik
           name="requestedDate"
           label="Requested Date"
           placeholder="Select Requested Date"
-          required
           type="date"
+          disabled
+
         />
       </div>
     </div>

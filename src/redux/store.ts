@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import {
   FLUSH,
   PAUSE,
@@ -10,22 +10,20 @@ import {
   REHYDRATE,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import type { UnknownAction } from "redux"; 
+import currencyReducer from "./slice/currencySlice"; 
+import lcTypeReducer from "./slice/lcTypeSlice"; 
 
-// --- Persist Config ---
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: [], // Add reducers you want to persist here
+  whitelist: ["currency", "lcType"],  
 };
 
 // --- Root Reducer ---
-const rootReducer = (state = {}, action: UnknownAction) => {
-  switch (action.type) {
-    default:
-      return state;
-  }
-};
+const rootReducer = combineReducers({
+  currency: currencyReducer,
+  lcType: lcTypeReducer,
+});
 
 // --- Persisted Reducer ---
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -45,6 +43,5 @@ export const store = configureStore({
 // --- Persistor ---
 export const persistor = persistStore(store);
 
-// --- Types ---
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

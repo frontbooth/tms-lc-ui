@@ -59,17 +59,14 @@ const Draft: FC = () => {
         showButton={true}
         onButtonClick={handleAddNew}
       >
-        <ReusableTabs
-          value={activeTab}
-          handleTabChange={handleTabChange}
-        />
+        <ReusableTabs value={activeTab} handleTabChange={handleTabChange} />
 
         {/* Render MainTable based on active tab */}
         <MainTable<DraftRecord>
           searchText={searchText}
           setSearchText={setSearchText}
           columns={columns}
-          dataSource={tabDataMap[activeTab] || []} 
+          dataSource={tabDataMap[activeTab] || []}
           pageSize={10}
           showResultCount={true}
           showSearch={true}
@@ -83,7 +80,8 @@ const Draft: FC = () => {
         modalIcon="true"
         width={700}
       >
-        <DraftModalForm />
+        {/* Pass onSubmitSuccess to close modal when form submits */}
+        <DraftModalForm onSubmitSuccess={handleCloseModal} />
       </ReusableModal>
     </>
   );

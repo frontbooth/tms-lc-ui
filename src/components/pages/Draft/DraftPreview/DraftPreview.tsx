@@ -7,7 +7,7 @@ import RequestDetails from "./RequestDetails/RequestDetails";
 import Buttons from "../../../atoms/Buttons/Buttons";
 
 interface DraftPreviewProps {
-  setShowPreview: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowPreview?: React.Dispatch<React.SetStateAction<boolean>>; // make optional
 }
 
 const DraftPreview: FC<DraftPreviewProps> = ({ setShowPreview }) => {
@@ -30,13 +30,15 @@ const DraftPreview: FC<DraftPreviewProps> = ({ setShowPreview }) => {
       </Accordion>
 
       <div className="flex justify-between my-8">
-        <Buttons
-          label="Back"
-          color="primary"
-          showarrowicon
-          type="button"
-          onClick={() => setShowPreview(false)}
-        />
+        {setShowPreview && (
+          <Buttons
+            label="Back"
+            color="primary"
+            showarrowicon
+            type="button"
+            onClick={() => setShowPreview(false)}
+          />
+        )}
         <Buttons label="Submit" color="secondary" showarrowicon type="submit" />
       </div>
     </ChildLayout>

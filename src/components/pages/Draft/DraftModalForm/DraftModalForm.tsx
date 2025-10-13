@@ -6,8 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Buttons from "../../../atoms/Buttons/Buttons";
 import { AtomInputFormik } from "../../../atoms/Input/AtomInputFormik";
-import { fetchCurrency, selectAllCurrency } from "../../../../redux/slice/currencySlice";
-import { fetchLcTypes, selectAllLcTypes } from "../../../../redux/slice/lcTypeSlice";
+import {
+  fetchCurrency,
+  fetchLcTypes,
+  selectAllCurrencies,
+  selectAllLcTypes,
+  selectLovLoading,
+} from "../../../../redux/slice/lov";
 import type { AppDispatch, RootState } from "../../../../redux/store";
 
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -26,29 +31,32 @@ const DraftModalForm: FC<DraftModalFormProps> = ({ onSubmitSuccess }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  // selectors
-  const currencies = useSelector((state: RootState) => selectAllCurrency(state));
+  // --- Redux selectors ---
+  const currencies = useSelector((state: RootState) => selectAllCurrencies(state));
   const lcTypes = useSelector((state: RootState) => selectAllLcTypes(state));
+  const loading = useSelector((state: RootState) => selectLovLoading(state));
 
+  // --- Fetch data ---
   useEffect(() => {
-    dispatch(fetchCurrency())
-      .unwrap()
-      .catch((err) => console.error("Failed to fetch currencies:", err));
+    if (!currencies.length) {
+      dispatch(fetchCurrency()).unwrap().catch((err) => console.error(err));
+    }
 
-    dispatch(fetchLcTypes())
-      .unwrap()
-      .catch((err) => console.error("Failed to fetch LC types:", err));
-  }, [dispatch]);
+    if (!lcTypes.length) {
+      dispatch(fetchLcTypes()).unwrap().catch((err) => console.error(err));
+    }
+  }, [dispatch, currencies.length, lcTypes.length]);
 
+  // --- Options for selects ---
   const lcCurrencyOptions =
-    currencies && currencies.length
+    currencies.length > 0
       ? currencies.map((c) => ({ value: c.id, label: c.name }))
-      : [{ value: "", label: "Loading currencies..." }];
+      : [{ value: "", label: loading ? "Loading currencies..." : "No currencies found" }];
 
   const lcTypeOptions =
-    lcTypes && lcTypes.length
+    lcTypes.length > 0
       ? lcTypes.map((t) => ({ value: t.id, label: t.name }))
-      : [{ value: "", label: "Loading LC types..." }];
+      : [{ value: "", label: loading ? "Loading LC types..." : "No LC types found" }];
 
   return (
     <Formik
@@ -60,9 +68,7 @@ const DraftModalForm: FC<DraftModalFormProps> = ({ onSubmitSuccess }) => {
       validationSchema={validationSchema}
       onSubmit={(values) => {
         console.log("Form Submitted:", values);
-
         if (onSubmitSuccess) onSubmitSuccess();
-
         navigate("/DraftForm");
       }}
     >

@@ -1,37 +1,25 @@
+// src/store/index.ts
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import {
-  FLUSH,
-  PAUSE,
-  PERSIST,
-  persistReducer,
-  persistStore,
-  PURGE,
-  REGISTER,
-  REHYDRATE,
+  FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import currencyReducer from "./slice/currencySlice"; 
-import lcTypeReducer from "./slice/lcTypeSlice"; 
+import lovReducer from "./slice/lov";
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["currency", "lcType"],  
+  whitelist: ["lov"], 
 };
 
-// --- Root Reducer ---
 const rootReducer = combineReducers({
-  currency: currencyReducer,
-  lcType: lcTypeReducer,
+  lov: lovReducer,
 });
 
-// --- Persisted Reducer ---
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// --- Store ---
 export const store = configureStore({
   reducer: persistedReducer,
-  devTools: true,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
@@ -40,8 +28,7 @@ export const store = configureStore({
     }),
 });
 
-// --- Persistor ---
 export const persistor = persistStore(store);
 
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof rootReducer>;
 export type AppDispatch = typeof store.dispatch;

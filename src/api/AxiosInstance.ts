@@ -13,4 +13,4 @@ export const getAxiosInstance = (service: ServiceType): AxiosInstance => {
   return axios.create({
     baseURL: baseUrls[service],
   });
-};
+}; 

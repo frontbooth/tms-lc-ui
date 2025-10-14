@@ -2,22 +2,21 @@ import type { FC } from "react";
 import ChildLayout from "../../../templates/ChildLayout";
 import Accordion from "../../../organism/Accordion/Accordion";
 import CustomerDetails from "./CustomerDetails/CustomerDetails";
-import LCDraftDetails from "./LCDraftDetails/LCDraftDetails";
 import RequestDetails from "./RequestDetails/RequestDetails";
 import Buttons from "../../../atoms/Buttons/Buttons";
+import LCDetails from "./LCDetails/LCDetails";
 
-interface DraftPreviewProps {
+interface IssuancePreviewProps {
   setShowPreview?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const DraftPreview: FC<DraftPreviewProps> = ({ setShowPreview }) => {
+const IssuancePreview: FC<IssuancePreviewProps> = ({ setShowPreview }) => {
   return (
     <ChildLayout
-      title="Letter of Credit Draft Form"
+
       showButton={false}
       withCardStyle={false}
     >
-      {/* Accordion sections */}
       <Accordion title="Request Details" isFirstOpen>
         <RequestDetails />
       </Accordion>
@@ -26,8 +25,8 @@ const DraftPreview: FC<DraftPreviewProps> = ({ setShowPreview }) => {
         <CustomerDetails />
       </Accordion>
 
-      <Accordion title="LC Draft Details">
-        <LCDraftDetails />
+      <Accordion title="LC Details">
+        <LCDetails />
       </Accordion>
 
       <div className="flex justify-between my-8">
@@ -37,11 +36,9 @@ const DraftPreview: FC<DraftPreviewProps> = ({ setShowPreview }) => {
           showarrowicon
           type="button"
           onClick={() => {
-            // Only call if provided
             if (setShowPreview) {
               setShowPreview(false);
             } else {
-              // If opened directly from route, navigate back in history
               window.history.back();
             }
           }}
@@ -58,4 +55,4 @@ const DraftPreview: FC<DraftPreviewProps> = ({ setShowPreview }) => {
   );
 };
 
-export default DraftPreview;
+export default IssuancePreview;

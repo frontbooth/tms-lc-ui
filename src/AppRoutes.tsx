@@ -7,6 +7,7 @@ import Closure from "./components/pages/Closure/Closure";
 import Homepage from "./components/pages/HomePage/Homepage";
 import DraftForm from "./components/pages/Draft/DraftForm/DraftForm";
 import DraftPreview from "./components/pages/Draft/DraftPreview/DraftPreview";
+import IssuanceFrom from "./components/pages/Issuance/IssuanceForm/IssuanceFrom";
 
 const AppRoutes = () => {
   return (
@@ -14,13 +15,14 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/draft" element={<Draft />} />
-         <Route path="/DraftForm" element={<DraftForm />} />
-         <Route path="/draft-preview" element={<DraftPreview />} />
+        <Route path="/DraftForm" element={<DraftForm />} />
+        <Route path="/draft-preview" element={<DraftPreview />} />
         <Route path="/issuance" element={<Issuance />} />
+        <Route path="/IssuanceForm" element={<IssuanceFrom />} />
         <Route path="/amendment" element={<Amendment />} />
         <Route path="/settlement" element={<Settlement />} />
         <Route path="/closure" element={<Closure />} />
-       
+
       </Routes>
     </BrowserRouter>
   );

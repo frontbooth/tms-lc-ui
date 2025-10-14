@@ -1,28 +1,29 @@
 import type { FC } from "react";
 import { useState } from "react";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
 import ChildLayout from "../../../templates/ChildLayout";
 import Accordion from "../../../organism/Accordion/Accordion";
 import Buttons from "../../../atoms/Buttons/Buttons";
-import LCDraftRequest from "./LCDraftRequest/LCDraftRequest";
-import { Formik, Form } from "formik";
-import * as Yup from "yup";
+import LCIssuanceRequest from "./LCIssuanceRequest/LCIssuanceRequest";
 import CustomerDetails from "./CustomerDetails/CustomerDetails";
-import LCDraftDetails from "./LCDraftDetails/LCDraftDetails";
 import { UseScrollToFirstError } from "../../../atoms/hooks/UseScrollToFirstError";
+import LCIssuanceDetails from "./LCIssuanceDetails/LCIssuanceDetails";
+import ConductorDetails from "./ConductorDetails/ConductorDetails";
+import LimitInformation from "./LimitInformation/LimitInformation";
+import MarginCommissionDetails from "./MarginCommissionDetails/MarginCommissionDetails";
+import ChecklistInformation from "./ChecklistInformation/ChecklistInformation";
+import IssuancePreview from "../IssuancePreview/IssuancePreview";
+import FixedDateConverterButton from "../../../molecules/DateConverter/DateConverter";
 import DocumentUpload from "./DocumentUpload/DocumentUpload";
-import DraftPreview from "../DraftPreview/DraftPreview";
 
 const validationSchema = Yup.object({
   requestInitiatedBy: Yup.string().required("Request Initiated By is required"),
-  requestInitiatedFrom: Yup.string().required(
-    "Request Initiated From is required"
-  ),
+  requestInitiatedFrom: Yup.string().required("Request Initiated From is required"),
   solId: Yup.string().required("SOL ID is required"),
   applicantName: Yup.string().required("Applicant Name is required"),
   address: Yup.string().required("Address is required"),
-  emailId: Yup.string()
-    .email("Invalid Email format")
-    .required("Email ID is required"),
+  emailId: Yup.string().email("Invalid Email format").required("Email ID is required"),
   urm: Yup.string().required("URM is required"),
   cif: Yup.string().required("CIF is required"),
   registrationNumber: Yup.string().required("Registration Number is required"),
@@ -30,13 +31,14 @@ const validationSchema = Yup.object({
   eximCode: Yup.string().required("EXIM Code is required"),
 });
 
-const DraftForm: FC = () => {
+const IssuanceForm: FC = () => {
   const [isAllOpen, setIsAllOpen] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
   return (
+    <>{!showPreview && <FixedDateConverterButton />}
     <ChildLayout
-      title="Letter of Credit Draft Form"
+      title="Letter of Credit Issuance Form"
       showButton={false}
       withCardStyle={false}
     >
@@ -54,44 +56,6 @@ const DraftForm: FC = () => {
           registrationNumber: "",
           pan: "",
           eximCode: "",
-          extractPreviousDraft: "",
-          lcReferenceNumber: "",
-          sequenceOfTotal: "",
-          formOfDocumentaryCredit: "",
-          creditType: "",
-          documentaryCreditNumber: "",
-          dateOfIssue: "",
-          applicableRules: "",
-          dateOfExpiry: "",
-          placeOfExpiry: "",
-          applicant: "",
-          beneficiary: "",
-          currencyCode: "",
-          amount: "",
-          tolerance: "",
-          availableWith: "",
-          availableBy: "",
-          mixedPaymentDetails: "",
-          paymentTerms: "",
-          drawee: "",
-          partialShipments: "",
-          transhipments: "",
-          placeOfTakingInCharge: "",
-          portOfLoading: "",
-          portOfDischarge: "",
-          latestDateOfShipment: "",
-          placeOfFinalDestination: "",
-          descriptionOfGoods: "",
-          documentsRequired: "",
-          additionalConditions: "",
-          charges: "",
-          periodOfPresentation: "",
-          confirmationInstructions: "",
-          requestedConfirmationParty: "",
-          reimbursingBank: "",
-          instructionsToBank: "",
-          adviseThroughBank: "",
-          senderToReceiverInformation: "",
         }}
         validationSchema={validationSchema}
         onSubmit={(values) => {
@@ -99,59 +63,80 @@ const DraftForm: FC = () => {
           setShowPreview(true);
         }}
       >
-        {({ errors, submitCount}) => {
-          // open accordion on first submit if validationerrors exist in formik
+        {({ errors, submitCount }) => {
           if (submitCount > 0 && Object.keys(errors).length > 0 && !isAllOpen) {
             setIsAllOpen(true);
           }
 
-          //scroll to first error only after submit
+   
           UseScrollToFirstError(errors, submitCount);
 
           return (
             <Form>
               <div
-                id="lc-draft-form-pane"
+                id="lc-issuance-form-pane"
                 className={showPreview ? "hidden" : "block"}
                 aria-hidden={showPreview ? "true" : "false"}
               >
-                <LCDraftRequest />
+                <LCIssuanceRequest />
 
                 <Accordion title="Customer Details" isAllOpen={isAllOpen}>
                   <CustomerDetails />
                 </Accordion>
 
-                <Accordion title="LC Draft Details" isAllOpen={isAllOpen}>
-                  <LCDraftDetails />
+                   <Accordion title="LC Details" isAllOpen={isAllOpen}>
+                  <LCIssuanceDetails />
                 </Accordion>
 
-                <Accordion title="Document Upload" isAllOpen={isAllOpen}>
+                  <Accordion title="Conductor Details" isAllOpen={isAllOpen}>
+                  <ConductorDetails />
+                </Accordion>
+
+                  <Accordion title="Checklist Information" isAllOpen={isAllOpen}>
+                  <ChecklistInformation />
+                </Accordion>
+
+                 <Accordion title="Limit Information" isAllOpen={isAllOpen}>
+                  <LimitInformation />
+                </Accordion>
+
+                   <Accordion title="Margin and Commission Details" isAllOpen={isAllOpen}>
+                  <MarginCommissionDetails />
+                </Accordion>
+
+                  <Accordion title="Document Upload" isAllOpen={isAllOpen}>
                   <DocumentUpload />
                 </Accordion>
 
                 <div className="flex justify-between my-8">
                   <Buttons label="Back" color="primary" />
                   <Buttons
-                    label="Preview"
+                    label="Submit"
                     color="secondary"
                     showarrowicon
                     type="submit"
                   />
                 </div>
               </div>
-              <div
-                id="lc-draft-form-preview"
-                className={showPreview ? "block" : "hidden"}
-                aria-hidden={showPreview ? "false" : "true"}
-              >
-                <DraftPreview setShowPreview={setShowPreview} />
-              </div>
+
+              {showPreview && (
+                <div
+                  id="lc-issuance-form-preview"
+                  className="block"
+                  aria-hidden="false"
+                >
+                  <div className="text-center text-lg font-semibold">
+                    <IssuancePreview setShowPreview={setShowPreview} />
+                  </div>
+                </div>
+              )}
             </Form>
           );
         }}
       </Formik>
     </ChildLayout>
+    </>
   );
 };
 
-export default DraftForm;
+export default IssuanceForm;

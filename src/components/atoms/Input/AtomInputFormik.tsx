@@ -28,21 +28,22 @@ interface MaskedInputProps {
 interface AtomInputFormikProps {
   name: string;
   type?:
-    | "text"
-    | "number"
-    | "textarea"
-    | "password"
-    | "mask"
-    | "radio"
-    | "checkbox"
-    | "select"
-    | "date"
-    | "amount";
+  | "text"
+  | "number"
+  | "textarea"
+  | "password"
+  | "mask"
+  | "radio"
+  | "checkbox"
+  | "select"
+  | "date"
+  | "amount";
   label?: string;
   checkedLabel?: string;
   required?: boolean;
   maskFormat?: string;
   max?: number;
+  rows?: number;
   options?: Option[];
   multiple?: boolean;
   size?: "small" | "middle" | "large";
@@ -71,10 +72,10 @@ const MaskedInput: React.FC<MaskedInputProps> = ({
 }) => {
   const formatValue = useCallback((val: string): string => {
     if (!val) return "";
-    
+
     let formatted = "";
     let valIndex = 0;
-    
+
     for (let i = 0; i < maskFormat.length && valIndex < val.length; i++) {
       const maskChar = maskFormat[i];
       if (maskChar === "9") {
@@ -120,6 +121,7 @@ const AtomInputFormik = forwardRef<InputRef, AtomInputFormikProps>(
       type = "text",
       maskFormat,
       max,
+      rows = 3,
       options = [],
       placeholder,
       multiple,
@@ -138,7 +140,7 @@ const AtomInputFormik = forwardRef<InputRef, AtomInputFormikProps>(
     ref
   ) => {
     // Formik context
-    const { values, errors, touched, setFieldValue, handleBlur: formikHandleBlur } = 
+    const { values, errors, touched, setFieldValue, handleBlur: formikHandleBlur } =
       useFormikContext<FormikValues>();
 
     const value = values?.[name];
@@ -146,17 +148,17 @@ const AtomInputFormik = forwardRef<InputRef, AtomInputFormikProps>(
     const hasError = Boolean(error);
 
     // Memoized styles and values
-    const errorStyle = useMemo((): React.CSSProperties => ({ 
-      borderColor: "#ff4d4f" 
+    const errorStyle = useMemo((): React.CSSProperties => ({
+      borderColor: "#ff4d4f"
     }), []);
 
-    const inputStyle = useMemo(() => 
+    const inputStyle = useMemo(() =>
       hasError ? { ...errorStyle, ...style } : style,
-    [hasError, errorStyle, style]);
+      [hasError, errorStyle, style]);
 
-    const pickerValue = useMemo((): Dayjs | null => 
+    const pickerValue = useMemo((): Dayjs | null =>
       value && typeof value === "string" ? dayjs(value) : (value as Dayjs) || null,
-    [value]);
+      [value]);
 
     // Event handlers
     const handleBlurWrapper = useCallback((e: any) => {
@@ -187,11 +189,11 @@ const AtomInputFormik = forwardRef<InputRef, AtomInputFormikProps>(
     const handleAmountInput = useCallback((e: React.FormEvent<HTMLInputElement>) => {
       let val = (e.target as HTMLInputElement).value.replace(/[^\d.]/g, "");
       const decimalIndex = val.indexOf(".");
-      
+
       if (decimalIndex !== -1) {
         val = val.substring(0, decimalIndex + 1) + val.substring(decimalIndex + 1, decimalIndex + 3);
       }
-      
+
       setFieldValue(name, val);
       onChange?.({ target: { value: val } });
     }, [setFieldValue, name, onChange]);
@@ -241,6 +243,8 @@ const AtomInputFormik = forwardRef<InputRef, AtomInputFormikProps>(
               }}
               onBlur={handleBlurWrapper}
               maxLength={max}
+              rows={rows}
+              style={{ ...inputStyle, resize: 'vertical' }}
             />
           );
 
@@ -304,9 +308,9 @@ const AtomInputFormik = forwardRef<InputRef, AtomInputFormikProps>(
               onChange={handleRadioChange}
               onBlur={handleBlurWrapper}
             >
-              {options.map((option) => (
+              {options.map((option: Option) => (
                 <Radio key={option.value} value={option.value}>
-                  {option.label}
+                  {option.label ?? ""}
                 </Radio>
               ))}
             </Radio.Group>
@@ -334,8 +338,8 @@ const AtomInputFormik = forwardRef<InputRef, AtomInputFormikProps>(
               {...commonProps}
               showSearch={showSearch}
               optionFilterProp="label"
-              filterOption={(input, option) =>
-                option.label.toString().toLowerCase().includes(input.toLowerCase())
+              filterOption={(input: string, option?: Option) =>
+                !!option?.label && option.label.toString().toLowerCase().includes(input.toLowerCase())
               }
               value={value}
               onChange={handleSelectChange}
@@ -373,7 +377,7 @@ const AtomInputFormik = forwardRef<InputRef, AtomInputFormikProps>(
           );
       }
     }, [
-      type, commonProps, value, max, maskFormat, options, showSearch, multiple,
+      type, commonProps, value, max, rows, maskFormat, options, showSearch, multiple,
       pickerValue, handleRadioChange, handleCheckboxChange, handleSelectChange,
       handleAmountInput, handleAmountBlur, handleNumberChange, handleBlurWrapper,
       setFieldValue, name, onChange, inputStyle, ref, checkedLabel

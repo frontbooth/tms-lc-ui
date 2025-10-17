@@ -6,10 +6,11 @@ import {
   AiFillEdit,
   AiOutlinePlus,
   AiFillDelete,
+  AiOutlineInteraction
 } from "react-icons/ai";
 
 interface IconButtonsProps {
-  iconType: "signature" | "view" | "edit" | "plus" | "delete";
+  iconType: "signature" | "view" | "edit" | "plus" | "delete" | "extract";
   tooltip: string;
   color?: string;
   onClick?: () => void;
@@ -39,11 +40,15 @@ const IconButtons: FC<IconButtonsProps> = ({
       break;
     case "plus":
       Icon = AiOutlinePlus;
-      defaultColor = "bg-blue-500"; 
+      defaultColor = "bg-blue-500";
       break;
     case "delete":
       Icon = AiFillDelete;
       defaultColor = "bg-red-500";
+      break;
+    case "extract":
+      Icon = AiOutlineInteraction;
+      defaultColor = "bg-blue-500";
       break;
     default:
       Icon = AiFillEye;
